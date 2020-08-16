@@ -25,7 +25,7 @@ def preprocess_config(c):
 
 
 parser = argparse.ArgumentParser(description="Run evaluation")
-parser.add_argument("--config", type=str, default="./src/config/config_cifar10.conf",
+parser.add_argument("--config", type=str, default="./src/config/config_pneumonia.conf",
                     help="Path to the config file.")
 
 parser.add_argument("--data.dataset", type=str, default=None)
@@ -45,7 +45,7 @@ parser.add_argument("--data.test_size", type=float, default=None)
 
 parser.add_argument("--data.weight_classes", type=bool, default=False)
 
-parser.add_argument("--model.path", type=str, default=None)
+parser.add_argument("--model.save_path", type=str, default=None)
 parser.add_argument("--model.nb_layers", type=str, default=None)
 parser.add_argument("--model.growth_rate", type=int, default=None)
 parser.add_argument("--model.reduction", type=int, default=None)
