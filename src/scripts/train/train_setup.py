@@ -8,6 +8,9 @@ import time
 import json
 import numpy as np
 import tensorflow as tf
+import sys
+sys.path.append('/workspace')
+sys.path.append('/workspace/src')
 import src.engines.train as train_engine
 from datetime import datetime
 from densenet import densenet_model
@@ -70,6 +73,7 @@ def train(config):
 
     train, val, _, nb_classes, image_shape, class_weights = load(
         dataset_name=config['data.dataset'],
+        dataset_dir=config['data.dataset_dir'],
         batch_size=config['data.batch_size'],
         train_size=config['data.train_size'],
         test_size=config['data.test_size'],

@@ -38,7 +38,7 @@ def train(model=None, epochs=10, batch_size=32, format_paths=True,
             train_accuracy.result()*100,
             val_loss.result(),
             val_accuracy.result()*100)
-        print ('Epoch: {}, Train Loss: {}, Train Acc:{}, Test Loss: {}, Test Acc: {}'.format(
+        print ('Epoch: {:4}, Train Loss: {:13.10f}, Train Acc:{:13.10f}, Test Loss: {:13.10f}, Test Acc: {:13.10f}'.format(
             epoch,
             train_loss.result(),
             train_accuracy.result()*100,

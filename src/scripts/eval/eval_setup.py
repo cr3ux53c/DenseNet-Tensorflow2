@@ -5,6 +5,9 @@ Logic for evaluation procedure of saved model.
 import tensorflow as tf
 import tensorflowjs as tfjs
 import tensorflow_datasets as tfds
+import sys
+sys.path.append('/workspace')
+sys.path.append('/workspace/src')
 from densenet import densenet_model
 from src.datasets import load
 from sklearn.metrics import classification_report, accuracy_score
@@ -13,13 +16,14 @@ from src.utils.weighted_loss import weightedLoss
 
 def eval(config):
     # Files path
-    model_file_path = f"{config['model.path']}"
+    model_file_path = f"{config['model.save_path']}"
     data_dir = f"data/"
 
     _, _, test, nb_classes, image_shape, class_weights = load(
         dataset_name=config['data.dataset'],
+        dataset_dir=config['data.dataset_dir'],
         batch_size=config['data.batch_size'],
-        train_size=config['data.train_size'],
+        # train_size=config['data.train_size'],
         test_size=config['data.test_size'],
         weight_classes=config['data.weight_classes'],
         datagen_flow=True,
@@ -48,7 +52,7 @@ def eval(config):
     test_loss = tf.keras.metrics.Mean(name='test_loss')
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
 
-    _, test_step = steps(model, loss_object, optimizer, test_loss=test_loss, test_accuracy=test_accuracy)
+    _, test_step = steps(model, loss_object, optimizer, train_loss=None, train_accuracy=None, test_loss=test_loss, test_accuracy=test_accuracy)
 
     print("Starting evaluation")
 
