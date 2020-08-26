@@ -25,7 +25,19 @@ def preprocess_config(c):
 
 
 parser = argparse.ArgumentParser(description="Run evaluation")
-parser.add_argument("--config", type=str, default="./src/config/config_pneumonia.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod0_256.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod0_700.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod0_1000.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod1_256.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod1_700.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod1_1000.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod2_256.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod2_700.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod2_1000.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod3_256.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod3_700.conf",
+# parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_mod3_1000.conf",
+parser.add_argument("--config", type=str, default="./src/config/config_pneumonia_original.conf",
                     help="Path to the config file.")
 
 parser.add_argument("--data.dataset", type=str, default=None)

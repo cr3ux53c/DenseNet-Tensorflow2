@@ -3,7 +3,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.utils.class_weight import compute_class_weight
-from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.datasets import cifar10, cifar100
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -15,33 +14,44 @@ import os
 class pneumonia:
     @staticmethod
     def load_data(dataset_dir):
-        
-        if os.path.isfile(join(dataset_dir, 'train_256.npy')):
-            x_train = np.load(join(dataset_dir, 'train_256.npy'))
-            x_test = np.load(join(dataset_dir, 'test_256.npy'))
+
+        sr_size = 256
+        sr_size = 1000
+        sr_size = 700
+        sr_size = 224
+        scale = 1
+        model_postfix = '_mod3_224'
+        model_postfix = ''
+
+        train_normal = glob.glob(join(dataset_dir, 'train_NORMAL_' + str(sr_size) + model_postfix, '*.png'))[:]
+        train_abnormal = glob.glob(join(dataset_dir, 'train_PNEUMONIA_' + str(sr_size) + model_postfix, '*.png'))[:]
+        test_normal = glob.glob(join(dataset_dir, 'test_NORMAL_' + str(sr_size) + model_postfix, '*.png'))[:]
+        test_abnormal = glob.glob(join(dataset_dir, 'test_PNEUMONIA_' + str(sr_size) + model_postfix, '*.png'))[:]
+
+        if os.path.isfile(join(dataset_dir, 'train_' + str(sr_size)+'.npy')):
+            x_train = np.load(join(dataset_dir, 'train_' + str(sr_size)+'.npy'))
+            x_test = np.load(join(dataset_dir, 'test_' + str(sr_size)+'.npy'))
         else:
-            train_normal = glob.glob(join(dataset_dir, 'train', 'NORMAL_256', '*.png'))[:]
-            train_abnormal = glob.glob(join(dataset_dir, 'train', 'PNEUMONIA_256', '*.png'))[:]
-            test_normal = glob.glob(join(dataset_dir, 'test', 'NORMAL_256', '*.png'))[:]
-            test_abnormal = glob.glob(join(dataset_dir, 'test', 'PNEUMONIA_256', '*.png'))[:]
-            
-            x_train = np.zeros((0, 512, 512, 3))
+            x_train = np.zeros((0, 224, 224, 3))
             for index, train_path in enumerate(train_normal + train_abnormal):
                 x_train = np.concatenate((x_train, np.expand_dims(cv2.imread(train_path), axis=0)), axis=0)
-                print('Load train dataset sample #{}/{}, {}'.format(index, len(dataset_train)-1, os.path.basename(train_path)))
+                print('Load train dataset sample #{}/{}, {}'.format(index, len(train_normal + train_abnormal)-1, os.path.basename(train_path)))
             
-            x_test = np.zeros((0, 512, 512, 3))
+            x_test = np.zeros((0, 224, 224, 3))
             for index, test_path in enumerate(test_normal + test_abnormal):
                 x_test = np.concatenate((x_test, np.expand_dims(cv2.imread(test_path), axis=0)), axis=0)
-                print('Load test dataset sample #{}/{}, {}'.format(index, len(dataset_test)-1, os.path.basename(test_path)))
+                print('Load test dataset sample #{}/{}, {}'.format(index, len(test_normal + test_abnormal)-1, os.path.basename(test_path)))
 
-            np.save(join(dataset_dir, 'train_256.npy'), x_train)
-            np.save(join(dataset_dir, 'test_256.npy'), x_test)
+            np.save(join(dataset_dir, 'train_' + str(sr_size)+'.npy'), x_train)
+            np.save(join(dataset_dir, 'test_' + str(sr_size)+'.npy'), x_test)
 
+        # Divice x_train to x_train and x_val
         y_train = np.append(np.zeros((len(train_normal), 1), dtype=np.int64), np.ones((len(train_abnormal), 1), dtype=np.int64))
         y_test = np.append(np.zeros((len(test_normal), 1), dtype=np.int64), np.ones((len(test_abnormal), 1), dtype=np.int64))
 
-        return (x_train, y_train), (x_test, y_test)
+        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, shuffle=True, stratify=y_train, random_state=None)
+
+        return (x_train, y_train), (x_val, y_val), (x_test, y_test)
 
 def load(dataset_name, dataset_dir=None, datagen_flow=False,
          weight_classes=False, batch_size=32,
@@ -60,17 +70,18 @@ def load(dataset_name, dataset_dir=None, datagen_flow=False,
     if dataset_name == "cifar10":
         # The data, split between train and test sets:
         (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+        x_val, y_val = x_test, y_test
     elif dataset_name == "cifar100":
         # The data, split between train and test sets:
         (x_train, y_train), (x_test, y_test) = cifar100.load_data(label_mode='fine')
+        x_val, y_val = x_test, y_test
     elif dataset_name == "pneumonia":
-        (x_train, y_train), (x_test, y_test) = pneumonia.load_data(dataset_dir=dataset_dir)
+        (x_train, y_train), (x_val, y_val), (x_test, y_test) = pneumonia.load_data(dataset_dir=dataset_dir)
     else:
         raise ValueError("Unknow dataset: {}".format(dataset_name))
 
     image_shape = np.shape(x_train)[1:]
 
-    x_val, y_val = x_test, y_test
     nb_classes = len(np.unique(y_train))
 
     class_weights = None
